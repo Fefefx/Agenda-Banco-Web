@@ -33,7 +33,25 @@
             if (request.getParameter("excluir") == null||request.getParameter("excluir").equals("feito")) {
         %>
                 <h1>Agenda de pessoas</h1>
+                <form action="index.jsp?refhesh=nao" method="post">
+                    <p> Pesquisar contato: </p>
+                    <%
+                        String nome_pesquisa=request.getParameter("nome_pesquisa");
+                        String refresh=request.getParameter("refresh");
+                        if(refresh!=null && refresh.equals("feito")){
+                            nome_pesquisa="";
+                        }
+                        if(nome_pesquisa != null)
+                            out.print("<input type='text' size='20' name='nome_pesquisa' value='"+nome_pesquisa+"'>");
+                        else
+                            out.print("<input type='text' size='20' name='nome_pesquisa'>");                            
+                    %>
+                    <br> <br>
+                    <input type="submit" value="Pesquisar">
+                </form>
+                <br>
                 <a href="operar.jsp?name=incluir"><img src="IMG/add.png" title="Adicionar" height="25px" width="25px"></a>
+                <a href="index.jsp?refresh=feito"><img src="IMG/refresh.png" title="Mostrar Tudo" height="25px" width="25px"></a>
                 <table>
                     <tr>
                         <td> Nome </td>
@@ -41,9 +59,12 @@
                         <td colspan="2"></td>
                     </tr>
                 <%
+                if(nome_pesquisa==null){
+                    nome_pesquisa="";
+                }
                 try{
                     Statement acessar=conectar.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
-                    String sql="Select * from Pessoas order by nome;";
+                    String sql="select * from Pessoas where nome like '"+nome_pesquisa+"%' order by nome;";
                     ResultSet consulta=acessar.executeQuery(sql);
                     try{
                         while(consulta.next()){
