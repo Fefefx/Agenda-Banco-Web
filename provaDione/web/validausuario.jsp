@@ -4,6 +4,7 @@
     Author     : felipe
 --%>
 
+<%@page import="java.sql.*"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,44 @@
         <title>Acessar Sistema</title>
     </head>
     <body>
-        <p>Deu certo</p>
+        <%
+              Connection conectar=null;
+              try{
+                   Class.forName("com.mysql.jdbc.Driver");
+                   String user="root";
+                   String password="";
+                   String url="jdbc:mysql://localhost/prova_dione";
+                   conectar=DriverManager.getConnection(url, user, password);
+              }catch(ClassNotFoundException clex){
+                  out.println("Erro ao carregar o driver do MySQL:"+clex);
+              }catch(SQLException sqlex){
+                  out.println("Erro ao acessar o banco de dados:"+sqlex);
+              }catch(Exception ex){
+                  out.println("Erro:"+ex);
+              }
+              String user=request.getParameter("user");
+              String password=request.getParameter("password");
+              Statement acessar=null;
+              try{
+                  acessar=conectar.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+                  String sql="select count(*) as valor from user where usuario='"+user+"' and senha='"+password+"';";
+                  ResultSet dado=acessar.executeQuery(sql);
+                  if(dado.next()){
+                      int valor=dado.getInt("valor");
+                      if(valor==0){
+                          %>
+                          <h1> Usuario  Incorreto ! </h1>
+                          <p>Usuario incorreto.<a href="index.jsp">Clique aqui para voltar</a></p>
+                          <%
+                      }else{
+                            %>
+                            <meta http-equiv="refresh" content="0.5; url=gerenciaprof.jsp">
+                            <%
+                      }
+                  }
+              }catch(SQLException sqlex){
+                  out.println("Erro de  SQL:"+sqlex);
+              }
+        %>
     </body>
 </html>

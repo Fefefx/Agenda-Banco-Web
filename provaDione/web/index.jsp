@@ -16,7 +16,7 @@
     <body>
         <form method="post" action="validausuario.jsp">
             <p>Login:&nbsp;&nbsp;<input type="text" size="20" name="user" required="required"></p>
-            <p>Senha:&nbsp;&nbsp;<input type="text" size="20" name="password" required="required"></p>
+            <p>Senha:&nbsp;&nbsp;<input type="password" size="20" name="password" required="required"></p>
             <input type="submit" value="Gerenciar Professores">
         </form>
         <h2>Faculdade de Tecnologia de Presidente Prudente</h2>
