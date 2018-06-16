@@ -33,6 +33,7 @@
             String user = request.getParameter("user");
             String operacao=request.getParameter("op");
             String cadastro=request.getParameter("cadProf");
+            String alterar=request.getParameter("altProf");
             out.println("<p class='user'> Usuario: "+user+"<a href='docentes.jsp'>"
                     + "<img src='IMG/shutdown.png' title='Sair' width='25' height='25'></a></p>");
             if (operacao == null) {
@@ -42,10 +43,20 @@
         %>
         <h1 style="text-align: center;"> Relaçao de professores cadastrados </h1>
         <br>
+        <%
+        out.println("<form action='gerenciaprof.jsp?user="+user+"'>");
+        %>
+            Pesquisar professor: <input type="text" size="20" name="pesquisa">
+            <input type="submit" value="Filtrar"> 
+        </form>
+        <%
+        out.println("<a href='gerenciaprof.jsp?op=inserir&user="+user+"'><img src='IMG/add.png' width='25' height='25' title='Adicionar professor'></a>");
+        out.println("<a href='gerenciaprof.jsp?op=mostrar&user="+user+"'><img src='IMG/refresh.png' width='25' height='25' title='Mostrar tudo'> </a>");
+        %>
         <table>
             <tr style="text-align: center;">
                 <td> Nome </td>
-                <td> Titulacaçao </td>
+                <td> Titulaçao </td>
                 <td> E-mail </td>
                 <td> Curriculo </td>
                 <td colspan="2"></td>
@@ -78,11 +89,12 @@
                 }
             }else if(operacao.equals("inserir")&&cadastro==null){
                 %>
-                <form action="gerenciaprof.jsp?op=inserir" method="post">
-                    <p>Nome:&nbsp;&nbsp;<input type="text" size="20" name="new_nome"> </p>
-                    <p>Titulacao:&nbsp;&nbsp;<input type="text" size="20" name="new_titulacao"></p>
-                    <p>Email:&nbps;&nbps;<input type="text" size="20" name="new_email"></p>
-                    <p> Link do curriculo:&nbps;&nbps;<input type="text" size="20" name="new_curriculo"></p>
+                <h2> Cadastrar professor </h2>
+               <% out.println("<form action='gerenciaprof.jsp?op=inserir&user="+user+"' method='post'>"); %>
+                    <p>Nome:&nbsp;&nbsp;<input type="text" size="40" name="new_nome"> </p>
+                    <p>Titulacao:&nbsp;&nbsp;<input type="text" size="10" name="new_titulacao"></p>
+                    <p>E-mail:&nbsp;&nbsp;<input type="text" size="40" name="new_email"></p>
+                    <p>Link do curriculo:&nbsp;&nbsp;<input type="text" size="40" name="new_curriculo"></p>
                     <input type="submit" value="Cadastrar" name="cadProf">
                 </form>
                 <%
@@ -92,7 +104,60 @@
                 String new_email=request.getParameter("new_email");
                 String new_curriculo=request.getParameter("new_curriculo");
                 try{
-                    String sql="";
+                    Statement acessar=conectar.createStatement();
+                    String sql="insert into Professor(nome,email,link_curriculo,titulacao) VALUES ('"+new_nome+"','"+new_email+"','"
+                    +new_curriculo+"','"+new_titulacao+"');";
+                    int res=acessar.executeUpdate(sql);
+                    if(res!=-1){
+                        out.println("<h1> Professor(a) inserido !</h1>");
+                        out.println("<p><a href='gerenciaprof.jsp?op=mostrar&user="+user+"'>Voltar</a></p>");
+                    }else{
+                        out.println("Erro ao inserir o professor !");
+                    }
+                }catch(SQLException sqlex){
+                    out.println("Erro de SQL:"+sqlex);
+                }
+            }else if(operacao.equals("excluir")){
+                try{
+                    Statement acessar=conectar.createStatement();
+                    String sql="delete from Professor where codigo="+codigo_param+";";
+                    int res=acessar.executeUpdate(sql);
+                    if(res!=-1){
+                        out.println("<h1> Exclusao de professor realizada com sucesso ! </h1>");
+                        out.println("<p><a href='gerenciaprof.jsp?op=mostrar&user="+user+"'>Voltar</a></p>");                        
+                    }else{
+                        out.println("Erro ao excluir o professor !");
+                    }
+                }catch(SQLException sqlex){
+                    out.println("Erro de SQL:"+sqlex);
+                }
+            }else if(operacao.equals("alterar")&&alterar==null){
+                try{
+                    Statement acessar=conectar.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+                    String sql="Select * from Professor where codigo="+codigo_param+";";
+                    ResultSet dados=acessar.executeQuery(sql);
+                    if(dados.next()){
+                        String v_nome=dados.getString("nome");
+                        String v_titulacao=dados.getString("titulacao");
+                        String v_email=dados.getString("email");
+                        String v_curriculo=dados.getString("link_curriculo");
+                        String v_codigo=dados.getString("codigo");
+                        out.println("<h1>Alterar professor</h1>");
+                        out.println("<form action='gerenciaprof.jsp?op=alterar&user="+user+"' method='post'>");
+                        out.println("<p>Codigo:&nbsp;&nbsp;<input type='text' size='1.5' name='alt_codigo' value='"+v_codigo+"' readonly='true'></p>");
+                        out.println("<p> Nome:&nbsp;&nbsp;<input type='text' size='40' name='alt_nome' value='"+v_nome+"' ></p>");
+                        out.println("<p> Titulaçao:&nbsp;&nbsp;<input type='text' size='10' name='alt_titulacao' value='"+v_titulacao+"'></p>");
+                        out.println("<p> E-mail:&nbsp;&nbsp;<input type='text' size='40' name='alt_email' value='"+v_email+"'></p>");
+                        out.println("<p> Link do Curriculo:&nbsp;&nbsp;<input type='text' size='40' name='alt_curriculo' value='"+v_curriculo+"'></p>");
+                        out.println("<input type='submit' value='Atualizar' name='altProf'>"); 
+                    }
+                }catch(SQLException sqlex){
+                     out.println("Erro de SQL:"+sqlex);
+                }
+            }else if(operacao.equals("alterar")&&alterar!=null){
+                String alt_nome,alt_titulacao,alt_email,alt_curriculo,alt_codigo;
+                try{
+                    Statement acessar=conectar.createStatement();
                 }catch(SQLException sqlex){
                     out.println("Erro de SQL:"+sqlex);
                 }
