@@ -31,10 +31,14 @@
             }
             String codigo_param = request.getParameter("codigo");
             String user = request.getParameter("user");
-            if (codigo_param == null) {
+            String operacao=request.getParameter("op");
+            String cadastro=request.getParameter("cadProf");
+            out.println("<p class='user'> Usuario: "+user+"<a href='docentes.jsp'>"
+                    + "<img src='IMG/shutdown.png' title='Sair' width='25' height='25'></a></p>");
+            if (operacao == null) {
                 out.println("<h1> Bem-vindo " + user+"</h1>");
             }
-            out.println("<p class='user'> Usuario: "+user+" </p>");
+            if(operacao==null || operacao.equals("mostrar")){
         %>
         <h1 style="text-align: center;"> Relaçao de professores cadastrados </h1>
         <br>
@@ -61,15 +65,38 @@
                         out.println("<tr>");
                         out.println("<td>" + nome + "</td>");
                         out.println("<td>" + titulacao + "</td>");
-                        out.println("<td>" + email + "</td>");
-                        out.println("<td>" + link_curriculo + "</td>");
-                        out.println("<td><a href='gerenciaprof.jsp?codigo=" + codigo + "'><img src='IMG/edit.png' width='25' height='25' title='Alterar'></a></td>");
-                        out.println("<td><img src='IMG/excluir.png' width='25' height='25' title='Excluir'></td>");
+                        out.println("<td> <a href='mailto:"+email+"'>" + email + "</a></td>");
+                        out.println("<td> <a href='"+link_curriculo+"' target='_blank'>" + link_curriculo + "</a></td>");
+                        out.println("<td><a href='gerenciaprof.jsp?codigo=" + codigo + "&user="+user+"&op=alterar'>"
+                                + "<img src='IMG/edit.png' width='25' height='25' title='Alterar'></a></td>");
+                        out.println("<td><a href='gerenciaprof.jsp?codigo="+codigo+"&user="+user+"&op=excluir'>"
+                                + "<img src='IMG/excluir.png' width='25' height='25' title='Excluir'></a></td>");
                         out.println("</tr>");
                     }
                 } catch (SQLException sqlex) {
                     out.println("Erro de SQL:" + sqlex);
                 }
+            }else if(operacao.equals("inserir")&&cadastro==null){
+                %>
+                <form action="gerenciaprof.jsp?op=inserir" method="post">
+                    <p>Nome:&nbsp;&nbsp;<input type="text" size="20" name="new_nome"> </p>
+                    <p>Titulacao:&nbsp;&nbsp;<input type="text" size="20" name="new_titulacao"></p>
+                    <p>Email:&nbps;&nbps;<input type="text" size="20" name="new_email"></p>
+                    <p> Link do curriculo:&nbps;&nbps;<input type="text" size="20" name="new_curriculo"></p>
+                    <input type="submit" value="Cadastrar" name="cadProf">
+                </form>
+                <%
+            }else if(operacao.equals("inserir")&&cadastro!=null){
+                String new_nome=request.getParameter("new_nome");
+                String new_titulacao=request.getParameter("new_titulacao");
+                String new_email=request.getParameter("new_email");
+                String new_curriculo=request.getParameter("new_curriculo");
+                try{
+                    String sql="";
+                }catch(SQLException sqlex){
+                    out.println("Erro de SQL:"+sqlex);
+                }
+            }
             %>
         </table>
     </body>
