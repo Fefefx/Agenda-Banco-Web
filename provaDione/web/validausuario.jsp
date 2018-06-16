@@ -38,14 +38,10 @@
                   if(dado.next()){
                       int valor=dado.getInt("valor");
                       if(valor==0){
-                          %>
-                          <h1> Usuario  Incorreto ! </h1>
-                          <p>Usuario incorreto.<a href="index.jsp">Clique aqui para voltar</a></p>
-                          <%
+                          out.println("<h1> Usuario  Incorreto ! </h1>");
+                          out.println("<p>Usuario e/ou senha incorretos ou inexistentes.<a href='docentes.jsp?user="+user+"'>Clique aqui para voltar</a></p>");
                       }else{
-                            %>
-                            <meta http-equiv="refresh" content="0.5; url=gerenciaprof.jsp">
-                            <%
+                          out.println("<meta http-equiv='refresh' content='0.2; url=gerenciaprof.jsp?user="+user+"'>");
                       }
                   }
               }catch(SQLException sqlex){
