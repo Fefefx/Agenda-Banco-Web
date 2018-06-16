@@ -39,7 +39,7 @@
                       int valor=dado.getInt("valor");
                       if(valor==0){
                           out.println("<h1> Usuario  Incorreto ! </h1>");
-                          out.println("<p>Usuario e/ou senha incorretos ou inexistentes.<br><a href='docentes.jsp?user="+user+"'>Clique aqui para voltar</a></p>");
+                          out.println("<p>Usuario e/ou senha incorretos ou inexistentes.<br><br><a href='docentes.jsp?user="+user+"'>Clique aqui para voltar</a></p>");
                       }else{
                           out.println("<meta http-equiv='refresh' content='0.2; url=gerenciaprof.jsp?user="+user+"'>");
                       }

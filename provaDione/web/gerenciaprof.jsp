@@ -37,22 +37,24 @@
             out.println("<p class='user'> Usuario: "+user+"<a href='docentes.jsp'>"
                     + "<img src='IMG/shutdown.png' title='Sair' width='25' height='25'></a></p>");
             if (operacao == null) {
-                out.println("<h1> Bem-vindo " + user+"</h1>");
+                out.println("<h1 style='margin-left:5%;'> Bem-vindo " + user+"</h1>");
             }
             if(operacao==null || operacao.equals("mostrar")){
         %>
         <h1 style="text-align: center;"> Relaçao de professores cadastrados </h1>
         <br>
+        <table>
         <%
-        out.println("<form action='gerenciaprof.jsp?user="+user+"'>");
+        out.println("<tr><td><form action='gerenciaprof.jsp?user="+user+"&op=mostrar' method='post'>");
         %>
             Pesquisar professor: <input type="text" size="20" name="pesquisa">
-            <input type="submit" value="Filtrar"> 
+            <input type="submit" value="Filtrar" name="filtro"> </td> 
         </form>
         <%
-        out.println("<a href='gerenciaprof.jsp?op=inserir&user="+user+"'><img src='IMG/add.png' width='25' height='25' title='Adicionar professor'></a>");
-        out.println("<a href='gerenciaprof.jsp?op=mostrar&user="+user+"'><img src='IMG/refresh.png' width='25' height='25' title='Mostrar tudo'> </a>");
+        out.println("<td><a href='gerenciaprof.jsp?op=inserir&user="+user+"'><img src='IMG/add.png' width='25' height='25' title='Adicionar professor'</td></a>");
+        out.println("<td><a href='gerenciaprof.jsp?op=mostrar&user="+user+"'><img src='IMG/refresh.png' width='25' height='25' title='Mostrar tudo'> </td></a></tr>");
         %>
+        </table>
         <table>
             <tr style="text-align: center;">
                 <td> Nome </td>
@@ -64,7 +66,13 @@
             <%
                 try {
                     Statement acessar = conectar.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    String sql = "Select * from Professor order by nome;";
+                    String sql;
+                    if(request.getParameter("filtro")==null){
+                        sql = "Select * from Professor order by nome;";
+                    }else{
+                        String filtro=request.getParameter("pesquisa");
+                        sql = "Select * from Professor where nome like '"+filtro+"%' order by nome;"; 
+                    }
                     ResultSet dados = acessar.executeQuery(sql);
                     while (dados.next()) {
                         String codigo, nome, email, link_curriculo, titulacao;
@@ -144,7 +152,7 @@
                         String v_codigo=dados.getString("codigo");
                         out.println("<h1>Alterar professor</h1>");
                         out.println("<form action='gerenciaprof.jsp?op=alterar&user="+user+"' method='post'>");
-                        out.println("<p>Codigo:&nbsp;&nbsp;<input type='text' size='1.5' name='alt_codigo' value='"+v_codigo+"' readonly='true'></p>");
+                        out.println("<p>Codigo:&nbsp;&nbsp;<input style='text-align:center;' type='text' size='1.5' name='alt_codigo' value='"+v_codigo+"' readonly='true'></p>");
                         out.println("<p> Nome:&nbsp;&nbsp;<input type='text' size='40' name='alt_nome' value='"+v_nome+"' ></p>");
                         out.println("<p> Titulaçao:&nbsp;&nbsp;<input type='text' size='10' name='alt_titulacao' value='"+v_titulacao+"'></p>");
                         out.println("<p> E-mail:&nbsp;&nbsp;<input type='text' size='40' name='alt_email' value='"+v_email+"'></p>");
@@ -156,8 +164,22 @@
                 }
             }else if(operacao.equals("alterar")&&alterar!=null){
                 String alt_nome,alt_titulacao,alt_email,alt_curriculo,alt_codigo;
+                alt_codigo=request.getParameter("alt_codigo");
+                alt_nome=request.getParameter("alt_nome");
+                alt_email=request.getParameter("alt_email");
+                alt_curriculo=request.getParameter("alt_curriculo");
+                alt_titulacao=request.getParameter("alt_titulacao");
                 try{
                     Statement acessar=conectar.createStatement();
+                    String sql="update Professor set nome='"+alt_nome+"', email='"+alt_email+"', link_curriculo='"
+                    +alt_curriculo+"', titulacao='"+alt_titulacao+"' where codigo="+alt_codigo+";";
+                    int res=acessar.executeUpdate(sql);
+                    if(res!=-1){
+                        out.println("<h1> Alteracao de professor realizada com sucesso ! </h1>");
+                        out.println("<p><a href='gerenciaprof.jsp?op=mostrar&user="+user+"'>Voltar</a></p>"); 
+                    }else{
+                        out.println("Erro ao alterar o professor !");
+                    }
                 }catch(SQLException sqlex){
                     out.println("Erro de SQL:"+sqlex);
                 }
